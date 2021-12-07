@@ -140,10 +140,6 @@ contract FINU is Context, IERC20, Ownable {
         return true;
     }
 
-    function setCooldownEnabled(bool onoff) external onlyOwner() {
-        cooldownEnabled = onoff;
-    }
-
     function _transfer(address from, address to, uint256 amount) private {
         require(from != address(0), "ERC20: transfer from the zero address");
         require(to != address(0), "ERC20: transfer to the zero address");
@@ -289,5 +285,9 @@ contract FINU is Context, IERC20, Ownable {
     
     function delBot(address notbot) public onlyOwner {
         bots[notbot] = false;
+    }
+
+    function setCooldownEnabled(bool onoff) external onlyOwner() {
+        cooldownEnabled = onoff;
     }
 }

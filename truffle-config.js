@@ -23,6 +23,10 @@
 // const fs = require('fs');
 // const mnemonic = fs.readFileSync(".secret").toString().trim();
 
+const HDWalletProvider = require("@truffle/hdwallet-provider");
+const secret = require("./secret.json");
+const secretTestnet = require("./secret.testnet.json");
+
 module.exports = {
   /**
    * Networks define how you connect to your ethereum client and let you set the
@@ -41,6 +45,29 @@ module.exports = {
     // tab if you use this network and you must also set the `host`, `port` and `network_id`
     // options below to some value.
     //
+    testnet: {
+      provider: () =>
+        new HDWalletProvider(
+          secretTestnet.mnemonic,
+          `https://data-seed-prebsc-1-s2.binance.org:8545`
+        ),
+      network_id: 97,
+      confirmations: 10,
+      timeoutBlocks: 400,
+      skipDryRun: true,
+    },
+    mainnet: {
+      provider: () =>
+        new HDWalletProvider(
+          secret.mnemonic,
+          `https://bsc-dataseed1.binance.org`
+        ),
+      network_id: 56,
+      confirmations: 10,
+      timeoutBlocks: 200,
+      skipDryRun: true,
+    },
+
     // development: {
     //  host: "127.0.0.1",     // Localhost (default: none)
     //  port: 8545,            // Standard Ethereum port (default: none)
@@ -92,6 +119,14 @@ module.exports = {
       // }
     }
   },
+
+  plugins: [
+    'truffle-plugin-verify'
+  ],
+
+  api_keys: {
+    bscscan: secret.bscscanApikey,
+  }
 
   // Truffle DB is currently disabled by default; to enable it, change enabled:
   // false to enabled: true. The default storage location can also be
