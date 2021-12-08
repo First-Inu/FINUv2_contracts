@@ -36,7 +36,7 @@ contract FINU is Context, IERC20, Ownable {
     mapping (address => mapping (address => uint256)) private _allowances;
     mapping (address => bool) private bots;
     mapping (address => uint) private cooldown;
-    uint256 private constant _tTotal = 1200000000000000 * 10**9; // total supply
+    uint256 private _tTotal; // total supply
     
     uint256 private _feeAddr; // team fee
     address payable private _treasuryWallet; // treasury wallet address
@@ -76,6 +76,8 @@ contract FINU is Context, IERC20, Ownable {
         _feeAddr = 0;
 
         _pancakeSwapRouterAddress = pancakeSwapRouterAddress;
+
+        _mint(msg.sender, 1200000000000000 * 10**9);
         emit Transfer(msg.sender, _msgSender(), _tTotal);
     }
 
@@ -91,7 +93,7 @@ contract FINU is Context, IERC20, Ownable {
         return _decimals;
     }
 
-    function totalSupply() public pure override returns (uint256) {
+    function totalSupply() public view override returns (uint256) {
         return _tTotal;
     }
 
@@ -231,6 +233,35 @@ contract FINU is Context, IERC20, Ownable {
 
         _allowances[owner][spender] = amount;
         emit Approval(owner, spender, amount);
+    }
+
+    function _mint(address account, uint256 amount) internal virtual {
+        require(account != address(0), "ERC20: mint to the zero address");
+
+        _beforeTokenTransfer(address(0), account, amount);
+
+        _tTotal += amount;
+        _balances[account] += amount;
+        emit Transfer(address(0), account, amount);
+
+        _afterTokenTransfer(address(0), account, amount);
+    }
+
+    function _burn(address account, uint256 amount) internal virtual {
+        require(account != address(0), "ERC20: burn from the zero address");
+
+        _beforeTokenTransfer(account, address(0), amount);
+
+        uint256 accountBalance = _balances[account];
+        require(accountBalance >= amount, "ERC20: burn amount exceeds balance");
+        unchecked {
+            _balances[account] = accountBalance - amount;
+        }
+        _tTotal -= amount;
+
+        emit Transfer(account, address(0), amount);
+
+        _afterTokenTransfer(account, address(0), amount);
     }
 
     function _beforeTokenTransfer(
