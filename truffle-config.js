@@ -54,7 +54,7 @@ module.exports = {
       network_id: 97,
       confirmations: 10,
       timeoutBlocks: 400,
-      skipDryRun: true,
+      skipDryRun: true
     },
     mainnet: {
       provider: () =>
@@ -65,7 +65,7 @@ module.exports = {
       network_id: 56,
       confirmations: 10,
       timeoutBlocks: 200,
-      skipDryRun: true,
+      skipDryRun: true
     },
 
     // development: {
