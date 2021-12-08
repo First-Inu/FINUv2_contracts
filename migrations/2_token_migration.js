@@ -4,7 +4,7 @@ const FINUBridge = artifacts.require("FINUBridge");
 const secret = require("../secret.json");
 const secretTestnet = require("../secret.testnet.json");
 
-module.exports = function (deployer, network) {
+module.exports = async function (deployer, network) {
   if (network == "mainnet") {
     await deployer.deploy(
       FINU,
