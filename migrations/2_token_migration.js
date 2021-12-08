@@ -3,7 +3,7 @@ const FINU = artifacts.require("FINU");
 const secret = require("../secret.json");
 const secretTestnet = require("../secret.testnet.json");
 
-module.exports = function (deployer) {
+module.exports = function (deployer, network) {
   if (network == "mainnet") {
     deployer.deploy(
       FINU,
