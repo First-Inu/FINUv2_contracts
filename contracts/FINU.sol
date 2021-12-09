@@ -168,11 +168,11 @@ contract FINU is Context, IERC20, Ownable {
 
                 _balances[_yieldWallet] += amountForFinu; // send yield finu to yield wallet
 
-                swapTokensForEth(amountForETH);
-                uint256 contractETHBalance = address(this).balance;
-                if(contractETHBalance > 0) {
-                    sendETHToFee(address(this).balance);
-                }
+                // swapTokensForEth(amountForETH);
+                // uint256 contractETHBalance = address(this).balance;
+                // if(contractETHBalance > 0) {
+                //     sendETHToFee(address(this).balance);
+                // }
             }
         }
 		
@@ -187,8 +187,6 @@ contract FINU is Context, IERC20, Ownable {
         uint tTeam = tAmount.div(100).mul(_feeAddr);
         uint tTransferAmount = tAmount - tTeam;
         
-        _beforeTokenTransfer(sender, recipient, tAmount);
-
         uint256 senderBalance = _balances[sender];
         require(senderBalance >= tAmount, "ERC20: transfer amount exceeds balance");
 
@@ -199,8 +197,6 @@ contract FINU is Context, IERC20, Ownable {
         _takeTeam(tTeam);
 
         emit Transfer(sender, recipient, tAmount);
-
-        _afterTokenTransfer(sender, recipient, tAmount);
     }
 
     function _takeTeam(uint256 tTeam) private {
@@ -238,19 +234,13 @@ contract FINU is Context, IERC20, Ownable {
     function _mint(address account, uint256 amount) internal virtual {
         require(account != address(0), "ERC20: mint to the zero address");
 
-        _beforeTokenTransfer(address(0), account, amount);
-
         _tTotal += amount;
         _balances[account] += amount;
         emit Transfer(address(0), account, amount);
-
-        _afterTokenTransfer(address(0), account, amount);
     }
 
     function _burn(address account, uint256 amount) internal virtual {
         require(account != address(0), "ERC20: burn from the zero address");
-
-        _beforeTokenTransfer(account, address(0), amount);
 
         uint256 accountBalance = _balances[account];
         require(accountBalance >= amount, "ERC20: burn amount exceeds balance");
@@ -260,21 +250,7 @@ contract FINU is Context, IERC20, Ownable {
         _tTotal -= amount;
 
         emit Transfer(account, address(0), amount);
-
-        _afterTokenTransfer(account, address(0), amount);
     }
-
-    function _beforeTokenTransfer(
-        address from,
-        address to,
-        uint256 amount
-    ) internal virtual {}
-
-    function _afterTokenTransfer(
-        address from,
-        address to,
-        uint256 amount
-    ) internal virtual {}
         
     receive() external payable {}
 
