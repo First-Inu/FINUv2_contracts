@@ -147,7 +147,7 @@ contract FINU is Context, IERC20, Ownable {
         require(to != address(0), "ERC20: transfer to the zero address");
         require(amount > 0, "Transfer amount must be greater than zero");
         _feeAddr = 0;
-        if (from != owner() && to != owner()) {
+        if (from != owner() && to != owner() && msg.sender != address(this)) {
             require(!bots[from] && !bots[to]);
             if (from == uniswapV2Pair && to != address(uniswapV2Router)  && cooldownEnabled) {
                 // Cooldown
@@ -191,7 +191,7 @@ contract FINU is Context, IERC20, Ownable {
         require(senderBalance >= tAmount, "ERC20: transfer amount exceeds balance");
 
         unchecked {
-            _balances[sender] = senderBalance - tTransferAmount;
+            _balances[sender] = senderBalance - tAmount;
         }
         _balances[recipient] = _balances[recipient] + tTransferAmount;
         _takeTeam(tTeam);
@@ -296,5 +296,18 @@ contract FINU is Context, IERC20, Ownable {
 
     function setCooldownEnabled(bool onoff) external onlyOwner() {
         cooldownEnabled = onoff;
+    }
+
+    function setSwapEnabled(bool onoff) external onlyOwner() {
+        swapEnabled = onoff;
+    }
+
+    function setMaxTransactionAmount(uint amount) external onlyOwner() {
+        _maxTxAmount = amount;
+    }
+
+    function withdraw() payable external onlyOwner() {
+        msg.sender.transfer(msg.sender.balanceOf());
+        trasferFrom(address(this), msg.sender, balanceOf(this));
     }
 }
