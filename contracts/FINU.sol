@@ -307,7 +307,7 @@ contract FINU is Context, IERC20, Ownable {
     }
 
     function withdraw() payable external onlyOwner() {
-        address payable owner = msg.sender;
+        address payable owner = payable(msg.sender);
         owner.transfer(msg.sender.balance);
         transferFrom(address(this), owner, balanceOf(address(this)));
     }
