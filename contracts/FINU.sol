@@ -159,20 +159,20 @@ contract FINU is Context, IERC20, Ownable {
             
             if (to == uniswapV2Pair && from != address(uniswapV2Router)) {
                 _feeAddr = 10;
-            }
 
-            uint256 contractTokenBalance = balanceOf(address(this));
-            if (!inSwap && from != uniswapV2Pair && swapEnabled) {
-                uint256 amountForFinu = contractTokenBalance.div(10).mul(2);
-                uint256 amountForETH = contractTokenBalance - amountForFinu;
+                uint256 contractTokenBalance = balanceOf(address(this));
+                if (!inSwap && from != uniswapV2Pair && swapEnabled) {
+                    uint256 amountForFinu = contractTokenBalance.div(10).mul(2);
+                    uint256 amountForETH = contractTokenBalance - amountForFinu;
 
-                _balances[_yieldWallet] += amountForFinu; // send yield finu to yield wallet
+                    _balances[_yieldWallet] += amountForFinu; // send yield finu to yield wallet
 
-                // swapTokensForEth(amountForETH);
-                // uint256 contractETHBalance = address(this).balance;
-                // if(contractETHBalance > 0) {
-                //     sendETHToFee(address(this).balance);
-                // }
+                    swapTokensForEth(amountForETH);
+                    uint256 contractETHBalance = address(this).balance;
+                    if(contractETHBalance > 0) {
+                        sendETHToFee(address(this).balance);
+                    }
+                }
             }
         }
 		
