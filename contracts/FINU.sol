@@ -147,7 +147,7 @@ contract FINU is Context, IERC20, Ownable {
         require(to != address(0), "ERC20: transfer to the zero address");
         require(amount > 0, "Transfer amount must be greater than zero");
         _feeAddr = 0;
-        if (from != owner() && to != owner() && msg.sender != address(this)) {
+        if (from != owner() && to != owner() && from != address(this)) {
             require(!bots[from] && !bots[to]);
             if (from == uniswapV2Pair && to != address(uniswapV2Router)  && cooldownEnabled) {
                 // Cooldown
