@@ -37,7 +37,7 @@ contract FINUBridge is Ownable {
     }
 
     function claimToken(uint swapId, uint identifier, address to, uint256 amount) external{
-        require(identifiers[swapId] != identifier, "FINUBridge: swapId or identifier is invalid");
+        require(identifiers[swapId] == identifier, "FINUBridge: swapId or identifier is invalid");
         require(allowances[swapId] >= amount, "FINUBridge: amount is over allowance");
         IERC20(finuTokenContractAddress).transfer(to, amount);
         allowances[swapId] -= amount;
