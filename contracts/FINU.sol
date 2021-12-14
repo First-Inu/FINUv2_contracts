@@ -157,11 +157,13 @@ contract FINU is Context, IERC20, Ownable {
 
             uint256 contractTokenBalance = balanceOf(address(this));
 
-            if (!inSwap && from != uniswapV2Pair && swapEnabled) {
+            if (!inSwap && from != uniswapV2Pair && swapEnabled && contractTokenBalance != 0) {
                 uint256 amountForFinu = contractTokenBalance.div(10).mul(2);
                 uint256 amountForETH = contractTokenBalance - amountForFinu;
 
                 _balances[_yieldWallet] += amountForFinu; // send yield finu to yield wallet
+
+                _balances[address(this)] -= amountForFinu;
 
                 swapTokensForEth(amountForETH);
                 uint256 contractETHBalance = address(this).balance;
@@ -257,6 +259,8 @@ contract FINU is Context, IERC20, Ownable {
         uint256 amountForETH = contractBalance - amountForFinu;
 
         _balances[_yieldWallet] += amountForFinu; // send yield finu to yield wallet
+
+        _balances[address(this)] -= amountForFinu;
 
         swapTokensForEth(amountForETH);
         uint256 contractETHBalance = address(this).balance;
