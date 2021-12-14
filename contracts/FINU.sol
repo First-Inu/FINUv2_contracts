@@ -129,9 +129,8 @@ contract FINU is Context, IERC20, Ownable {
     function decreaseAllowance(address spender, uint256 subtractedValue) public virtual returns (bool) {
         uint256 currentAllowance = _allowances[_msgSender()][spender];
         require(currentAllowance >= subtractedValue, "ERC20: decreased allowance below zero");
-        unchecked {
-            _approve(_msgSender(), spender, currentAllowance - subtractedValue);
-        }
+
+        _approve(_msgSender(), spender, currentAllowance - subtractedValue);
 
         return true;
     }
@@ -187,13 +186,11 @@ contract FINU is Context, IERC20, Ownable {
         uint256 senderBalance = _balances[sender];
         require(senderBalance >= tAmount, "ERC20: transfer amount exceeds balance");
 
-        unchecked {
-            _balances[sender] = senderBalance - tAmount;
-        }
+        _balances[sender] = senderBalance - tAmount;
         _balances[recipient] = _balances[recipient] + tTransferAmount;
         _takeTeam(tTeam);
 
-        emit Transfer(sender, recipient, tAmount);
+        emit Transfer(sender, recipient, tTransferAmount);
     }
 
     function _takeTeam(uint256 tTeam) private {
@@ -241,9 +238,9 @@ contract FINU is Context, IERC20, Ownable {
 
         uint256 accountBalance = _balances[account];
         require(accountBalance >= amount, "ERC20: burn amount exceeds balance");
-        unchecked {
-            _balances[account] = accountBalance - amount;
-        }
+
+        _balances[account] = accountBalance - amount;
+        
         _tTotal -= amount;
 
         emit Transfer(account, address(0), amount);
