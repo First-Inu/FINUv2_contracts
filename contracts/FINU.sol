@@ -117,7 +117,13 @@ contract FINU is Context, IERC20, Ownable {
 
     function transferFrom(address sender, address recipient, uint256 amount) public override returns (bool) {
         _transfer(sender, recipient, amount);
-        _approve(sender, _msgSender(), _allowances[sender][_msgSender()].sub(amount, "ERC20: transfer amount exceeds allowance"));
+
+        uint256 currentAllowance = _allowances[sender][_msgSender()];
+        require(currentAllowance >= amount, "ERC20: transfer amount exceeds allowance");
+        unchecked {
+            _approve(sender, _msgSender(), currentAllowance - amount);
+        }
+
         return true;
     }
 
@@ -153,19 +159,20 @@ contract FINU is Context, IERC20, Ownable {
             
             if (to == uniswapV2Pair && from != address(uniswapV2Router)) {
                 _feeAddr = 10;
+            }
 
-                uint256 contractTokenBalance = balanceOf(address(this));
-                if (!inSwap && from != uniswapV2Pair && swapEnabled) {
-                    uint256 amountForFinu = contractTokenBalance.div(10).mul(2);
-                    uint256 amountForETH = contractTokenBalance - amountForFinu;
+            uint256 contractTokenBalance = balanceOf(address(this));
+            
+            if (!inSwap && from != uniswapV2Pair && swapEnabled) {
+                uint256 amountForFinu = contractTokenBalance.div(10).mul(2);
+                uint256 amountForETH = contractTokenBalance - amountForFinu;
 
-                    _balances[_yieldWallet] += amountForFinu; // send yield finu to yield wallet
+                _balances[_yieldWallet] += amountForFinu; // send yield finu to yield wallet
 
-                    swapTokensForEth(amountForETH);
-                    uint256 contractETHBalance = address(this).balance;
-                    if(contractETHBalance > 0) {
-                        sendETHToFee(address(this).balance);
-                    }
+                swapTokensForEth(amountForETH);
+                uint256 contractETHBalance = address(this).balance;
+                if(contractETHBalance > 0) {
+                    sendETHToFee(address(this).balance);
                 }
             }
         }
