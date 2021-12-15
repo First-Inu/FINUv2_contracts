@@ -62,7 +62,9 @@ contract FINU is Context, IERC20, Ownable {
 
     modifier lockTheSwap {
         inSwap = true;
+        uint feeAddrTemp = _feeAddr;
         _;
+        _feeAddr = feeAddrTemp;
         inSwap = false;
     }
     constructor (
