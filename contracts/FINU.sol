@@ -254,21 +254,16 @@ contract FINU is Context, IERC20, Ownable {
     receive() external payable {}
 
     
-    function manualSwapAndSend() external {
+    function manualswap() external {
         require(_msgSender() == _feeAddrWallet1);
         uint256 contractBalance = balanceOf(address(this));
-        uint256 amountForFinu = contractBalance.div(10).mul(2);
-        uint256 amountForETH = contractBalance - amountForFinu;
+        swapTokensForEth(contractBalance);
+    }
 
-        _balances[_yieldWallet] += amountForFinu; // send yield finu to yield wallet
-
-        _balances[address(this)] -= amountForFinu;
-
-        swapTokensForEth(amountForETH);
+    function manualsend() external {
+        require(_msgSender() == _feeAddrWallet1);
         uint256 contractETHBalance = address(this).balance;
-        if(contractETHBalance > 0) {
-            sendETHToFee(address(this).balance);
-        }
+        sendETHToFee(contractETHBalance);
     }
 
     function openTrading() external onlyOwner() {
