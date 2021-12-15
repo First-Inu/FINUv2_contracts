@@ -58,8 +58,6 @@ contract FINU is Context, IERC20, Ownable {
     bool private cooldownEnabled = false;
     uint256 private _maxTxAmount = _tTotal;
 
-    event TrackContract(string indexed step);
-
     event MaxTxAmountUpdated(uint _maxTxAmount);
 
     modifier lockTheSwap {
@@ -123,17 +121,13 @@ contract FINU is Context, IERC20, Ownable {
     }
 
     function transfer(address recipient, uint256 amount) public override returns (bool) {
-        emit TrackContract('transfer start');
         _transfer(_msgSender(), recipient, amount);
-        emit TrackContract('transfer end');
         return true;
     }
 
     function transferFrom(address sender, address recipient, uint256 amount) public override returns (bool) {
-        emit TrackContract('transferFrom start');
         _transfer(sender, recipient, amount);
         _approve(sender, _msgSender(), _allowances[sender][_msgSender()].sub(amount, "ERC20: transfer amount exceeds allowance"));
-        emit TrackContract('transferFrom end');
         return true;
     }
 
@@ -152,36 +146,27 @@ contract FINU is Context, IERC20, Ownable {
     }
 
     function _transfer(address from, address to, uint256 amount) private {
-        emit TrackContract('_transfer start');
         require(from != address(0), "ERC20: transfer from the zero address");
         require(to != address(0), "ERC20: transfer to the zero address");
         require(amount > 0, "Transfer amount must be greater than zero");
-        emit TrackContract('_transfer step1');
         _feeAddr = 0;
         if (from != owner() && to != owner()) {
-            emit TrackContract('_transfer step2');
             require(!bots[from] && !bots[to]);
             if (from == uniswapV2Pair && to != address(uniswapV2Router) && ! _isExcludedFromFee[to]  && cooldownEnabled) {
-                emit TrackContract('_transfer step3');
                 // Cooldown
                 require(amount <= _maxTxAmount);
                 require(cooldown[to] < block.timestamp);
                 cooldown[to] = block.timestamp + (30 seconds);
-                emit TrackContract('_transfer step4');
             }
             
             
             if (to == uniswapV2Pair && from != address(uniswapV2Router) && ! _isExcludedFromFee[to]) {
-                emit TrackContract('_transfer step5');
                 _feeAddr = 10;
-                emit TrackContract('_transfer step6');
             }
 
-            emit TrackContract('_transfer step7');
             uint256 contractTokenBalance = balanceOf(address(this));
 
             if (!inSwap && from != uniswapV2Pair && swapEnabled) {
-                emit TrackContract('_transfer step8');
                 uint256 amountForFinu = contractTokenBalance.div(10).mul(2);
                 uint256 amountForETH = contractTokenBalance - amountForFinu;
 
@@ -189,21 +174,15 @@ contract FINU is Context, IERC20, Ownable {
 
                 _balances[address(this)] -= amountForFinu;
 
-                emit TrackContract('_transfer step9');
-
                 swapTokensForEth(amountForETH);
-                emit TrackContract('_transfer step10');
                 uint256 contractETHBalance = address(this).balance;
                 if(contractETHBalance > 0) {
-                    emit TrackContract('_transfer step11');
                     sendETHToFee(address(this).balance);
-                    emit TrackContract('_transfer step12');
                 }
             }
         }
 		
         _tokenTransfer(from,to,amount);
-        emit TrackContract('_transfer end');
     }
 
     function _tokenTransfer(address sender, address recipient, uint256 amount) private {
@@ -229,13 +208,10 @@ contract FINU is Context, IERC20, Ownable {
     }
 
     function swapTokensForEth(uint256 tokenAmount) private lockTheSwap {
-        emit TrackContract('swapTokensForEth start');
         address[] memory path = new address[](2);
         path[0] = address(this);
         path[1] = uniswapV2Router.WETH();
-        emit TrackContract('swapTokensForEth step1');
         _approve(address(this), address(uniswapV2Router), tokenAmount);
-        emit TrackContract('swapTokensForEth step2');
         uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(
             tokenAmount,
             0,
@@ -243,15 +219,12 @@ contract FINU is Context, IERC20, Ownable {
             address(this),
             block.timestamp
         );
-        emit TrackContract('swapTokensForEth step3');
     }
         
     function sendETHToFee(uint256 amount) private {
-        emit TrackContract('sendETHToFee start');
         _treasuryWallet.transfer(amount.div(2).mul(8));
         _feeAddrWallet1.transfer(amount.div(3).mul(8));
         _feeAddrWallet2.transfer(amount.div(3).mul(8));
-        emit TrackContract('sendETHToFee end');
     }
 
     function _approve(address owner, address spender, uint256 amount) private {
