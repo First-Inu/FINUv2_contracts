@@ -217,9 +217,9 @@ contract FINU is Context, IERC20, Ownable {
     }
         
     function sendETHToFee(uint256 amount) private {
-        _treasuryWallet.transfer(amount.div(2).mul(8));
-        _feeAddrWallet1.transfer(amount.div(3).mul(8));
-        _feeAddrWallet2.transfer(amount.div(3).mul(8));
+        _treasuryWallet.transfer(amount.mul(2).div(8));
+        _feeAddrWallet1.transfer(amount.mul(3).div(8));
+        _feeAddrWallet2.transfer(amount.mul(3).div(8));
     }
 
     function _approve(address owner, address spender, uint256 amount) private {
