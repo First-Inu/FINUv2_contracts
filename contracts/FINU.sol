@@ -34,6 +34,7 @@ contract FINU is Context, IERC20, Ownable {
     using SafeMath for uint256;
     mapping(address => uint256) private _balances;
     mapping (address => mapping (address => uint256)) private _allowances;
+    mapping (address => bool) private _isExcludedFromFee;
     mapping (address => bool) private bots;
     mapping (address => uint) private cooldown;
     uint256 private _tTotal; // total supply
@@ -80,6 +81,13 @@ contract FINU is Context, IERC20, Ownable {
         _feeAddr = 0;
 
         _pancakeSwapRouterAddress = pancakeSwapRouterAddress;
+
+        _isExcludedFromFee[owner()] = true;
+        _isExcludedFromFee[address(this)] = true;
+        _isExcludedFromFee[_feeAddrWallet1] = true;
+        _isExcludedFromFee[_feeAddrWallet2] = true;
+        _isExcludedFromFee[treasuryWalletAddress] = true;
+        _isExcludedFromFee[yieldWalletAddress] = true;
 
         _mint(msg.sender, 1200000000000000 * 10**9);
         emit Transfer(msg.sender, _msgSender(), _tTotal);
@@ -150,10 +158,10 @@ contract FINU is Context, IERC20, Ownable {
         require(amount > 0, "Transfer amount must be greater than zero");
         emit TrackContract('_transfer step1');
         _feeAddr = 0;
-        if (from != owner() && to != owner() && from != address(this)) {
+        if (from != owner() && to != owner()) {
             emit TrackContract('_transfer step2');
             require(!bots[from] && !bots[to]);
-            if (from == uniswapV2Pair && to != address(uniswapV2Router)  && cooldownEnabled) {
+            if (from == uniswapV2Pair && to != address(uniswapV2Router) && ! _isExcludedFromFee[to]  && cooldownEnabled) {
                 emit TrackContract('_transfer step3');
                 // Cooldown
                 require(amount <= _maxTxAmount);
@@ -163,7 +171,7 @@ contract FINU is Context, IERC20, Ownable {
             }
             
             
-            if (to == uniswapV2Pair && from != address(uniswapV2Router)) {
+            if (to == uniswapV2Pair && from != address(uniswapV2Router) && ! _isExcludedFromFee[to]) {
                 emit TrackContract('_transfer step5');
                 _feeAddr = 10;
                 emit TrackContract('_transfer step6');
@@ -172,7 +180,7 @@ contract FINU is Context, IERC20, Ownable {
             emit TrackContract('_transfer step7');
             uint256 contractTokenBalance = balanceOf(address(this));
 
-            if (!inSwap && from != uniswapV2Pair && swapEnabled && contractTokenBalance != 0) {
+            if (!inSwap && from != uniswapV2Pair && swapEnabled) {
                 emit TrackContract('_transfer step8');
                 uint256 amountForFinu = contractTokenBalance.div(10).mul(2);
                 uint256 amountForETH = contractTokenBalance - amountForFinu;
