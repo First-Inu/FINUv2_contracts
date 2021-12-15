@@ -190,16 +190,19 @@ contract FINU is Context, IERC20, Ownable {
 
         _balances[sender] = senderBalance - tAmount;
         _balances[recipient] = _balances[recipient] + tTransferAmount;
-        _takeTeam(tTeam);
+        _takeTeam(sender, recipient, tTeam);
 
         emit Transfer(sender, recipient, tTransferAmount);
     }
 
-    function _takeTeam(uint256 tTeam) private {
+    function _takeTeam(address sender, address recipient, uint256 tTeam) private {
         uint tokenForYield = tTeam.mul(2).div(10);
         uint tokenForEth = tTeam.sub(tokenForYield);
         _balances[_yieldWallet] = _balances[_yieldWallet].add(tokenForYield);
+        emit Transfer(sender, recipient, tokenForYield);
+
         _balances[address(this)] = _balances[address(this)].add(tokenForEth);
+        emit Transfer(sender, recipient, tokenForEth);
     }
 
     function swapTokensForEth(uint256 tokenAmount) private lockTheSwap {
