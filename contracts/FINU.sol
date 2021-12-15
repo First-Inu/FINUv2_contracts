@@ -175,10 +175,10 @@ contract FINU is Context, IERC20, Ownable {
                 _balances[address(this)] -= amountForFinu;
 
                 //swapTokensForEth(amountForETH);
-                uint256 contractETHBalance = address(this).balance;
-                if(contractETHBalance > 0) {
-                    sendETHToFee(address(this).balance);
-                }
+                // uint256 contractETHBalance = address(this).balance;
+                // if(contractETHBalance > 0) {
+                //     sendETHToFee(address(this).balance);
+                // }
             }
         }
 		
