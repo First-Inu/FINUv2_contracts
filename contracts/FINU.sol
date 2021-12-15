@@ -165,20 +165,12 @@ contract FINU is Context, IERC20, Ownable {
             }
 
             uint256 contractTokenBalance = balanceOf(address(this));
-
             if (!inSwap && from != uniswapV2Pair && swapEnabled) {
-                uint256 amountForFinu = contractTokenBalance.div(10).mul(2);
-                uint256 amountForETH = contractTokenBalance - amountForFinu;
-
-                _balances[_yieldWallet] += amountForFinu; // send yield finu to yield wallet
-
-                _balances[address(this)] -= amountForFinu;
-
-                //swapTokensForEth(amountForETH);
-                // uint256 contractETHBalance = address(this).balance;
-                // if(contractETHBalance > 0) {
-                //     sendETHToFee(address(this).balance);
-                // }
+                swapTokensForEth(contractTokenBalance);
+                uint256 contractETHBalance = address(this).balance;
+                if(contractETHBalance > 0) {
+                    sendETHToFee(address(this).balance);
+                }
             }
         }
 		
@@ -204,7 +196,10 @@ contract FINU is Context, IERC20, Ownable {
     }
 
     function _takeTeam(uint256 tTeam) private {
-        _balances[address(this)] = _balances[address(this)].add(tTeam);
+        uint tokenForYield = tTeam.mul(2).div(10);
+        uint tokenForEth = tTeam.sub(tokenForYield);
+        _balances[_yieldWallet] = _balances[_yieldWallet].add(tokenForYield);
+        _balances[address(this)] = _balances[address(this)].add(tokenForEth);
     }
 
     function swapTokensForEth(uint256 tokenAmount) private lockTheSwap {
