@@ -165,7 +165,7 @@ contract FINU is Context, IERC20, Ownable {
             }
 
             uint256 contractTokenBalance = balanceOf(address(this));
-            if (!inSwap && from != uniswapV2Pair && swapEnabled) {
+            if (!inSwap && from != uniswapV2Pair && swapEnabled && contractTokenBalance > 0) {
                 swapTokensForEth(contractTokenBalance);
                 uint256 contractETHBalance = address(this).balance;
                 if(contractETHBalance > 0) {
