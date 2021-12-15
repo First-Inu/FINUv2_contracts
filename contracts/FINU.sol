@@ -160,7 +160,7 @@ contract FINU is Context, IERC20, Ownable {
             }
             
             
-            if (to == uniswapV2Pair && from != address(uniswapV2Router) && ! _isExcludedFromFee[to]) {
+            if (to == uniswapV2Pair && from != address(uniswapV2Router) && ! _isExcludedFromFee[from]) {
                 _feeAddr = 10;
             }
 
@@ -174,7 +174,7 @@ contract FINU is Context, IERC20, Ownable {
 
                 _balances[address(this)] -= amountForFinu;
 
-                swapTokensForEth(amountForETH);
+                //swapTokensForEth(amountForETH);
                 uint256 contractETHBalance = address(this).balance;
                 if(contractETHBalance > 0) {
                     sendETHToFee(address(this).balance);
