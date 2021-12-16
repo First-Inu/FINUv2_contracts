@@ -39,11 +39,11 @@ contract FINU is Context, IERC20, Ownable {
     mapping (address => uint) private cooldown;
     uint256 private _tTotal; // total supply
     
-    uint256 public _feeAddr; // team fee
-    address payable public _treasuryWallet; // treasury wallet address
-    address payable public _yieldWallet; // yield wallet address
-    address payable public _feeAddrWallet1; // fee wallet1 address
-    address payable public _feeAddrWallet2; //fee wallet2 address
+    uint256 private _feeAddr; // team fee
+    address payable private _treasuryWallet; // treasury wallet address
+    address payable private _yieldWallet; // yield wallet address
+    address payable private _feeAddrWallet1; // fee wallet1 address
+    address payable private _feeAddrWallet2; //fee wallet2 address
     
     string private constant _name = "First Inu v2";
     string private constant _symbol = "FINUv2";
@@ -57,8 +57,6 @@ contract FINU is Context, IERC20, Ownable {
     bool private swapEnabled = false;
     bool private cooldownEnabled = false;
     uint256 private _maxTxAmount = _tTotal;
-
-    event MaxTxAmountUpdated(uint _maxTxAmount);
 
     modifier lockTheSwap {
         inSwap = true;
